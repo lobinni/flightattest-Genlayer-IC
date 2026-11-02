@@ -1,0 +1,23 @@
+{
+  "network": "genlayer-studio",
+  "network_description": "GenLayer Studio consensus environment",
+  "contract": {
+    "name": "FlightAttest",
+    "source_file": "contracts/flight_attest.py",
+    "source_sha256": "b7d2610ad1a20324d8cf73bb8900be92395bb65b39459843ebf607eff24aa154",
+    "policy_version": "PRIORITY_V2",
+    "constructor_args": []
+  },
+  "deployment": {
+    "address": "0xeE3d4EF77cf1176869Ca16116120e4C9fEB78f12",
+    "explorer_url": "https://explorer-studio.genlayer.com/address/0xeE3d4EF77cf1176869Ca16116120e4C9fEB78f12",
+    "recorded_at": "2026-11-02T11:01:07Z",
+    "deployment_tx": "see the explorer page for the deployment transaction details"
+  },
+  "schema": {
+    "write": ["register_flight", "attest_flight"],
+    "view": ["get_flight", "get_attestation", "get_flight_attestation_id"]
+  },
+  "verify_integrity": "shasum -a 256 contracts/flight_attest.py  # must equal contract.source_sha256",
+  "verify_schema": "genlayer schema 0xeE3d4EF77cf1176869Ca16116120e4C9fEB78f12  # must list the 5 methods above"
+}

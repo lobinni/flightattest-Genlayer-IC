@@ -1,0 +1,7 @@
+# Direct-mode tests (mock GenVM runner, no chain required)
+pytest>=8.0,<10.0
+
+# Studio / network integration tests (optional, see docs/TESTING.md)
+# genlayer-test (gltest) and the genlayer CLI are installed separately:
+#   npm install -g genlayer
+#   pip install genlayer-test

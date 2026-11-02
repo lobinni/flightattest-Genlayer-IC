@@ -1,0 +1,48 @@
+{
+  "description": "Scripted end-to-end scenarios. 'pages' are replayed by the direct-mode harness (tests/direct/flightattest_support.py); status/claim values follow the FA_OBS sentinel convention explained in docs/TESTING.md.",
+  "flight": {
+    "flight_id": "st221-2026-03-10",
+    "carrier": "Skyline Air",
+    "flight_number": "ST221",
+    "departure_airport": "SGN",
+    "arrival_airport": "SFO",
+    "scheduled_departure": "2026-03-10T08:30:00Z"
+  },
+  "scenarios": [
+    {
+      "name": "all_sources_agree_on_schedule",
+      "pages": {"AIRLINE": "ON_SCHEDULE", "DEPARTURE_AIRPORT": "ON_SCHEDULE", "TRACKER": "ON_SCHEDULE"},
+      "expected": {"final_status": "ON_SCHEDULE", "operation_state": "LIVE", "method": "AGREEMENT", "fallback_used": false}
+    },
+    {
+      "name": "airline_down_tracker_says_delayed",
+      "pages": {"AIRLINE": "HTTP_404", "DEPARTURE_AIRPORT": {"DELAYED": {"new_dep_date": "2026-03-10", "new_dep_time": "11:45", "new_dep_tz": "Z"}}, "TRACKER": {"DELAYED": {"new_dep_date": "2026-03-10", "new_dep_time": "11:45", "new_dep_tz": "Z"}}},
+      "expected": {"final_status": "DELAYED", "controlling_source": "S2", "fallback_used": true, "new_dep_precision": "FULL"}
+    },
+    {
+      "name": "tracker_disagrees_priority_rule_wins",
+      "pages": {"AIRLINE": "ON_SCHEDULE", "DEPARTURE_AIRPORT": "ON_SCHEDULE", "TRACKER": "CANCELLED"},
+      "expected": {"final_status": "ON_SCHEDULE", "method": "PRIORITY_RULE", "conflicts": ["STATUS_MISMATCH@S3"]}
+    },
+    {
+      "name": "airline_page_ambiguous_blocks_everything",
+      "pages": {"AIRLINE": "AMBIGUOUS", "DEPARTURE_AIRPORT": "ON_SCHEDULE", "TRACKER": "ON_SCHEDULE"},
+      "expected": {"final_status": "INSUFFICIENT_EVIDENCE", "reason": "CONTROLLING_SOURCE_AMBIGUOUS"}
+    },
+    {
+      "name": "all_pages_about_another_flight",
+      "pages": {"AIRLINE": "IDENTITY_MISMATCH", "DEPARTURE_AIRPORT": "IDENTITY_MISMATCH", "TRACKER": "IDENTITY_MISMATCH"},
+      "expected": {"final_status": "FLIGHT_IDENTITY_UNCONFIRMED", "reason": "IDENTITY_UNCONFIRMED_ALL_RETRIEVED"}
+    },
+    {
+      "name": "everything_down",
+      "pages": {"AIRLINE": "NET_FAIL", "DEPARTURE_AIRPORT": "HTTP_503", "TRACKER": "HTTP_429"},
+      "expected": {"final_status": "INSUFFICIENT_EVIDENCE", "reason": "NO_USABLE_SOURCE"}
+    },
+    {
+      "name": "diversion_recorded_with_airport",
+      "pages": {"AIRLINE": {"DIVERTED": {"diversion_airport": "OAK"}}, "DEPARTURE_AIRPORT": {"DIVERTED": {"diversion_airport": "OAK"}}, "TRACKER": "NET_FAIL"},
+      "expected": {"final_status": "DIVERTED", "operation_state": "LIVE", "diversion_airport": "OAK"}
+    }
+  ]
+}
